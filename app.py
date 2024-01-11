@@ -11,12 +11,11 @@ import seaborn as sns
 import pickle 
 
 # Mengimport model 
-GaussianNB = pickle.load(open('GaussianNB.pkl','rb'))
+nb = pickle.load(open('NB.pkl','rb'))
 
 # Menload dataset
 data = pd.read_csv('bankdataset.csv')
 
-# Mengatur data untuk di drop -> data = data.drop(data.columns[0],axis=1)
 
 st.title('Aplikasi Bank Customer')
 
@@ -83,22 +82,16 @@ def user_report():
     customer_id     = st.sidebar.slider('customer_id', 0, 5, 10000)
 
     # Input untuk fitur kategorikal
-    countries       = ['Spain', 'Germany']
-    country         = st.sidebar.selectbox('country', countries)
-    gender          = st.sidebar.selectbox('gender', ['Male', 'Female'])
     credit_card     = st.sidebar.checkbox('Has Credit Card')
     active_member   = st.sidebar.checkbox('Active Member')
     churn           = st.sidebar.radio('Churn', ['Yes', 'No'])
     
     # Mengonversi gender dan churn ke nilai float
-    gender = 0.0 if gender == 'Male' else 1.0
     churn = 0.0 if churn == 'No' else 1.0
-    country = 0.0 if country == 'Germany' else 1.0
 
     # Membuat DataFrame
     user_report_data = {
         'customer_id': customer_id,
-        'gender': gender,
         'credit_card': credit_card,
         'active_member': active_member,
         'churn': churn,
@@ -107,19 +100,20 @@ def user_report():
         'tenure': Tenure,
         'products_number': Jumlah_Produk,
         'estimated_salary': Estimasi_Gaji,
-        'country': country,
     }
-
-    report_data = pd.DataFrame([user_report_data])
+        
+    report_data = pd.DataFrame(user_report_data, index=[0])
 
     return report_data
+
+
 #Data Pasion
 user_data = user_report()
 st.subheader('Data churn Kostumer Bank')
 st.write(user_data)
 
-user_result = GaussianNB.predict(user_data)
-nb_score = accuracy_score(y_test,GaussianNB.predict(X_test))
+user_result = nb.predict(user_data)
+nb_score = accuracy_score(y_test,nb.predict(X_test))
 
 #output
 st.subheader('Hasilnya adalah : ')
